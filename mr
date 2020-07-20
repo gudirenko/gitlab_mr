@@ -1,0 +1,54 @@
+#!/bin/bash                                                                                                                                                                            
+
+usage() {
+    echo "Usage: $0 [-m] user_id   default user_id=198; -m for master branch" 1>&2; exit 1;
+}
+
+while getopts "msh" opt; do
+    case $opt in
+        m)
+            MASTER=1
+        ;;
+        s)
+            SQUASH0="false"
+        ;;
+        h)
+            echo "Creates merge request by current branch, last commit message uses as MR title, squash commits enabled by default"
+            echo "Usage: $0 [-m] user_id"
+            echo "Examples:"
+            echo "mr          opens mr into devel, assignee_id=198 (by default)"
+            echo "mr -m 234   opens mr into master, assignee_id=234"
+            echo "mr -s 234   opens mr into devel, squash disabled"
+            exit 1;
+        ;;
+        \?)
+            echo "ERROR: Invalid option -$OPTARG"
+            usage
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+
+ARG=$1                                                                                                                                                                                 
+ASSIGNEE_ID=${ARG:=198}
+ASSIGNEE_ID2=234
+
+echo "---------------------------------------------------------------- MR link ------------------------------------------------------------------------------------------------------"
+APP=${PWD##*/}
+SOURCE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+TITLE0=$(git log -1 --pretty=%B)
+TITLE="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$TITLE0")"
+
+if [ "$MASTER" == 1 ]; then
+    TARGET_BRANCH="master"
+else
+    TARGET_BRANCH="devel"
+fi   
+
+SQUASH=${SQUASH0:="true"}
+
+#LINK="https://gitlab.favorit/erlang/$APP/merge_requests/new/diffs?merge_request[source_branch]=$SOURCE_BRANCH&merge_request[title]=$TITLE&merge_request[target_branch]=$TARGET_BRANCH&merge_request[assignee_ids][]=$ASSIGNEE_ID&merge_request[assignee_ids][]=$ASSIGNEE_ID2&merge_request[squash]=$SQUASH"
+LINK="https://gitlab.favorit/erlang/$APP/merge_requests/new/diffs?merge_request%5Bsource_branch%5D=$SOURCE_BRANCH&merge_request%5Btitle%5D=$TITLE&merge_request%5Btarget_branch%5D=$TARGET_BRANCH&merge_request%5Bassignee_ids%5D%5B%5D=$ASSIGNEE_ID&merge_request%5Bassignee_ids%5D%5B%5D=$ASSIGNEE_ID2&merge_request%5Bsquash%5D=$SQUASH"
+echo $LINK
+xdg-open $LINK
+echo "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
