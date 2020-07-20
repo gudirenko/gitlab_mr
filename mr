@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                            
 
 usage() {
-    echo "Usage: $0 [-m] user_id   default user_id=198; -m for master branch" 1>&2; exit 1;
+    echo "Usage: mr [-m] [-s] assignee_id   default user_id=198; -m for master branch" 1>&2; exit 1;
 }
 
 while getopts "msh" opt; do
@@ -14,7 +14,7 @@ while getopts "msh" opt; do
         ;;
         h)
             echo "Creates merge request by current branch, last commit message uses as MR title, squash commits enabled by default"
-            echo "Usage: $0 [-m] user_id"
+            echo "Usage: mr [-m] [-s] assignee_id"
             echo "Examples:"
             echo "mr          opens mr into devel, assignee_id=198 (by default)"
             echo "mr -m 234   opens mr into master, assignee_id=234"
