@@ -36,8 +36,8 @@ ASSIGNEE_ID2=234
 echo "---------------------------------------------------------------- MR link ------------------------------------------------------------------------------------------------------"
 APP=${PWD##*/}
 SOURCE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
-TITLE0=$(git log -1 --pretty=%B)
-TITLE="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$TITLE0")"
+TITLE0=$(git log -1 --pretty=%B | head -n 1)
+TITLE="\"$TITLE0\""
 
 if [ "$MASTER" == 1 ]; then
     TARGET_BRANCH="master"
